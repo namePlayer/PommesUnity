@@ -1,4 +1,5 @@
 <?php
+session_start();
 require('../inc/database.inc.php');
 require('../inc/noxss/HTMLPurifier.auto.php');
 
@@ -6,7 +7,31 @@ $msg = "";
 
 if(isset($_SESSION['pu_login'])) {
   if(!isset($_SESSION['pu_control_login'])) {
+    if(isset($_POST['email']) && isset($_POST['password'])) {
+      $mail = $_POST['email'];
+      $password = $_POST['password'];
 
+      $stmt = $conn->prepare("SELECT * FROM pu_users WHERE email = :mail");
+      $stmt->bindParam(":mail", $mail);
+      $stmt->execute();
+      $result = $stmt->rowCount();
+      $data = $stmt->fetch();
+      if($result == 1) {
+        $dbpw = $data['password'];
+        if(password_verify($password, $dbpw)) {
+          $_SESSION['pu_control_login'] = $data['user_id'];
+          header("Location: dashboard.php");
+        } else {
+          $msg = '<div class="alert alert-danger" role="alert">
+                    Anmeldung fehlgeschlagen!
+                  </div>';  
+        }
+      } else {
+        $msg = '<div class="alert alert-danger" role="alert">
+                  Anmeldung fehlgeschlagen!
+                </div>';  
+      }
+    }
   } else {
     header("Location: dashboard.php");
   }

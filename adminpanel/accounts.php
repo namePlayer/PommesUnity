@@ -2,6 +2,7 @@
 session_start();
 require('../inc/database.inc.php');
 require('../inc/noxss/HTMLPurifier.auto.php');
+require('../inc/accounteng.inc.php');
 
 if(isset($_SESSION['pu_login'])) {
   if(isset($_SESSION['pu_control_login'])) {
@@ -21,7 +22,7 @@ if(isset($_SESSION['pu_login'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-  <title>PommesUnity CP | Dashboard</title>
+  <title>PommesUnity CP | Nutzerverwaltung</title>
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -55,7 +56,7 @@ if(isset($_SESSION['pu_login'])) {
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">PommesUnity - Verwaltungsoberfläche</h1>
+            <h1 class="m-0 text-dark">PommesUnity - Nutzerverwaltung</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -68,74 +69,42 @@ if(isset($_SESSION['pu_login'])) {
     </div>
 
     <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-              <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Registrierte Nutzer</span>
-                <span class="info-box-number">
-                  <?php
+      <div class="row">
+        <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Liste aller Registrierten Nutzer</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <div class="row">
+              <div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-6"></div></div><div class="row"><div class="col-sm-12"><table id="example2" class="table table-bordered table-hover dataTable dtr-inline" role="grid" aria-describedby="example2_info">
+                <thead>
+                    <tr role="row"><th class="sorting_asc" rowspan="1" colspan="1">ID</th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Nutzername</th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Anzeigename</th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Letzter Login</th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Account Punkte</th>
+                        <th class="sorting" tabindex="0" rowspan="1" colspan="1">Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
                     $stmt = $conn->prepare("SELECT * FROM pu_users");
                     $stmt->execute();
-                    $data = $stmt->rowCount();
-                    echo $data;
-                  ?>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-success elevation-1"><i class="fas fa-list"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Eingetragene Rezepte</span>
-                <span class="info-box-number">
-                  <?php
-                    $stmt = $conn->prepare("SELECT * FROM pu_recipes");
-                    $stmt->execute();
-                    $data = $stmt->rowCount();
-                    echo $data;
-                  ?>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="clearfix hidden-md-up"></div>
-
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-red elevation-1"><i class="fas fa-exclamation-circle"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Meldungen</span>
-                <span class="info-box-number">
-                0
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box mb-3">
-              <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
-
-              <div class="info-box-content">
-                <span class="info-box-text">Neue Nutzer | <small>Letzte 24 Stunden</small></span>
-                <span class="info-box-number">
-                  <?php
-                    $date = strtotime('-24 hours', time());
-                    $stmt = $conn->prepare("SELECT * FROM pu_users WHERE registered_at > :dated");
-                    $stmt->bindParam(":dated", $date);
-                    $stmt->execute();
-                    $result = $stmt->rowCount();
-                    echo $result;
-                  ?>
-                </span>
-              </div>
+                    while($row = $stmt->fetch()) {
+                        echo '<tr role="row" class="odd">
+                        <td tabindex="0" class="sorting_1">'.$row['user_id'].'</td>
+                        <td>'.$row['username'].'</td>
+                        <td>'.renderDisplaynameOther($row['user_id']).'</td>
+                        <td>'.date("d.m.Y", $row['last_login']).' - '.date("H:i", $row['last_login']).'</td>
+                        <td>'.$row['account_points'].'</td>
+                        <td><a href="manageuser.php?id='.$row['user_id'].'">Nutzer Verwalten</a></td>
+                      </tr>';
+                    }
+                ?>
+                </tbody>
+              </table></div></div><div class="row"><div class="col-sm-12 col-md-5"></div></div></div>
             </div>
           </div>
         </div>
