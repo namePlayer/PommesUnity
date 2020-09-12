@@ -27,7 +27,9 @@ if(isset($_SESSION['pu_login'])) {
     <link rel="stylesheet" href="<?php base() ?>css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php base() ?>css/all.min.css">
     <link rel="stylesheet" href="<?php base() ?>css/secondarynav.css">
+    <link rel="stylesheet" href="<?php base() ?>css/custom.css">
     <script src="<?php base() ?>js/tinymce/tinymce.min.js"></script>
+    
     <script>
     tinymce.init({
         selector:'textarea',
