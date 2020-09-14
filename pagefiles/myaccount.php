@@ -1,7 +1,79 @@
 <?php
-if(!isset($_SESSION['pu_login'])) { header("Location: ".insertBase()."login/"); }
+if(!isset($_SESSION['pu_login'])) { header("Location: ".insertBase()."login/"); } else {
+    if(isset($_POST['oldPassword']) && isset($_POST['newPassword']) && isset($_POST['newPasswordAg'])) {
+        $opw = $_POST['oldPassword'];
+        $npw = $_POST['newPassword'];
+        $npw2 = $_POST['newPasswordAg'];
+        if(empty($opw) || empty($npw) || empty($npw2)) {
+
+        } else {
+            if($npw == $npw2) {
+                $stmt = $conn->prepare("SELECT * FROM pu_users WHERE user_id = :usid");
+                $stmt->bindParam(":usid", $userid);
+                if($stmt->execute()) {
+                    $result = $stmt->rowCount();
+                    $data = $stmt->fetch();
+                    if($result > 0) {
+                        $dbpw = $data['password'];
+                        if(password_verify($opw, $dbpw)) {
+                            $dbnewpw = password_hash($npw, PASSWORD_BCRYPT);
+                            $stmt = $conn->prepare("UPDATE pu_users SET password = :pwd WHERE user_id = :userid");
+                            $stmt->bindParam(":pwd", $dbnewpw);
+                            $stmt->bindParam(":userid", $userid);
+                            if($stmt->execute()) {
+                                $return = '<div class="alert alert-success" role="alert">Dein Passwort wurde geändert!</div>';
+                            } else {
+                                $return = '<div class="alert alert-danger" role="alert">Ein fehler ist Aufgetreten. Bitte versuche es in wenigen Minuten erneut! (Error = 010)</div>';
+                            }
+                        } else {
+                            $return = '<div class="alert alert-danger" role="alert">Das alte Passwort ist falsch!</div>';
+                        }
+                    } else {
+                        session_destroy();
+                        header("Location: ".insertBase()."login/");
+                    }
+                } else {
+                    $return = '<div class="alert alert-danger" role="alert">Ein fehler ist Aufgetreten. Bitte versuche es in wenigen Minuten erneut! (PwdCh Error = 001)</div>';
+                }
+            } else {
+                $return = '<div class="alert alert-danger" role="alert">Die Angegebenen Passwörter stimmen nicht überein!</div>';
+            }
+        }
+    }
+    if(isset($_POST['newDp'])) {
+        $displayname = $_POST['newDp'];
+        if(!empty($displayname)) {
+            $stmt = $conn->prepare("UPDATE pu_users SET displayname = :newdp WHERE user_id = :usid");
+            $stmt->bindParam(":newdp", $displayname);
+            $stmt->bindParam(":usid", $userid);
+            if($stmt->execute()) {
+                $return = '<div class="alert alert-success" role="alert">Dein Anzeigename wurde geändert!</div>';
+            } else {
+                $return = '<div class="alert alert-danger" role="alert">Ein fehler ist Aufgetreten. Bitte versuche es in wenigen Minuten erneut!</div>';
+            }
+        } else {
+            $return = '<div class="alert alert-danger" role="alert">Der Nutzername kann nicht leer sein!</div>';
+        }
+    }
+    if(isset($_POST['bio'])) {
+        $displayname = $_POST['bio'];
+        if(!empty($displayname)) {
+            $stmt = $conn->prepare("UPDATE pu_users SET biographie = :bio WHERE user_id = :usid");
+            $stmt->bindParam(":bio", $displayname);
+            $stmt->bindParam(":usid", $userid); 
+            if($stmt->execute()) {
+                $return = '<div class="alert alert-success" role="alert">Deine Biografie wurde geändert!</div>';
+            } else {
+                $return = '<div class="alert alert-danger" role="alert">Ein fehler ist Aufgetreten. Bitte versuche es in wenigen Minuten erneut!</div>';
+            }
+        } else {
+            $return = '<div class="alert alert-danger" role="alert">Der Nutzername kann nicht leer sein!</div>';
+        }
+    }
+}
 ?>
 
+<?= $return; ?>
 <div class="row">
     <div class="col-md-3" style="margin-bottom: 25px;">
         <div class="list-group">
@@ -9,7 +81,6 @@ if(!isset($_SESSION['pu_login'])) { header("Location: ".insertBase()."login/"); 
                 Mein Konto
             </a>
             <a href="<?php base() ?>myaccount/mydata/" class="list-group-item list-group-item-action"><i class="fas fa-info-circle"></i> Account Daten ändern</a>
-            <a href="<?php base() ?>myaccount/profilepage/" class="list-group-item list-group-item-action"><i class="fas fa-eye"></i> Profil Seite anpassen</a>
             <a href="<?php base() ?>myaccount/password/" class="list-group-item list-group-item-action"><i class="fas fa-user-lock"></i> Passwort ändern</a>
             <a href="<?php base() ?>myaccount/privacy/" class="list-group-item list-group-item-action"><i class="fas fa-shield-alt"></i> Datenschutz Optionen</a>
             <a href="<?php base() ?>logout/" class="list-group-item list-group-item-action"><i class="fas fa-power-off"></i> Abmelden</a>
@@ -121,37 +192,69 @@ if(!isset($_SESSION['pu_login'])) { header("Location: ".insertBase()."login/"); 
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                         <td><span class="badge bg-secondary">Pommes Män <i class="fas fa-infinity" title="Partner"></i></span></td>
                         <td>0</td>
                         <td>01.11.1980</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
         </div>
         <?php
     } else if($url[1] == "mydata") {
+        
     ?>
         <div class="col-md-9">
-            
-        </div>
-    <?php
-    } else if($url[1] == "profilepage") {
-    ?>
-        <div class="col-md-9">
-            
+            <h4>Mein Profil</h4>
+            <hr>
+            <h5 class="font-underline">Anzeigenamen ändern</h5>
+            <form action="" method="post">
+                <div class="mb-3">
+                    <label for="newDp" class="form-label">Neuer Anzeigename</label>
+                    <input type="text" class="form-control" id="newDp" name="newDp" aria-describedby="newDpInfo" value="<?php echo getDisplayname(); ?>">
+                    <div id="newDpInfo" class="form-text">Dieser Name ist nicht dein Nutzername!</div>
+                </div>
+                <button type="submit" class="btn btn-dark">Anzeigename updaten</button>
+            </form>
+            <hr>
+            <h5 class="font-underline">Biografie schreiben</h5>
+            <form action="" method="post">
+                <div class="mb-3">
+                <label for="bio" class="form-label">Neuer Anzeigename</label>
+                <input type="text" class="form-control" id="bio" name="bio" value="<?php echo getBio(); ?>">
+                </div>
+                <button type="submit" class="btn btn-dark">Biografie updaten</button>
+            </form>
         </div>
     <?php
     } else if($url[1] == "password") {
     ?>
         <div class="col-md-9">
-            
+            <h4>Passwort ändern</h4>
+            <form action="" method="post">
+                <div class="mb-3">
+                    <label for="oldPassword" class="form-label">Altes Passwort</label>
+                    <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">Neues Passwort</label>
+                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newPasswordAg" class="form-label">Neues Passwort wiederholen</label>
+                    <input type="password" class="form-control" id="newPasswordAg" name="newPasswordAg" required>
+                </div>
+                <button type="submit" class="btn btn-dark">Passwort ändern</button>
+            </form>
         </div>
     <?php
     } else if($url[1] == "privacy") {
     ?>
         <div class="col-md-9">
+        <div class="alert alert-danger">
+            Diese Seite ist noch in Entwicklung und daher passiert hier noch nichts!
+        </div>
         <h4>Datenschutz Einstellungen</h4>
             <form action="" method="post">
                 <fieldset>
@@ -213,7 +316,7 @@ if(!isset($_SESSION['pu_login'])) { header("Location: ".insertBase()."login/"); 
         </div>
     <?php
     } else {
-        echo 'error';
+        echo '<div class="col-md-9"><div class="alert alert-danger" role="alert">Diese Seite wurde nicht gefunden!</div></div>';
     }
     ?>
 </div>

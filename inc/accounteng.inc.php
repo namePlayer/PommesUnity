@@ -19,6 +19,10 @@ if(isset($_SESSION['pu_login'])) {
             global $accountdata;
             return $accountdata['displayname'];
         }
+        function getBio() {
+            global $accountdata;
+            return $accountdata['biographie'];
+        }
         function getPoints() {
             global $accountdata;
             return $accountdata['account_points'];

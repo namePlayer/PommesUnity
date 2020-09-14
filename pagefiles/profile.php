@@ -1,30 +1,90 @@
 <?php
-  if($url[1] == "" || !is_numeric($url[1])) {
-    header("Location: home/");
+  if($url[1] === "" || !is_numeric($url[1])) {
+    header("Location: ".insertBase()."home/");
+  } else {
+    $currentuserid = $url[1];
+    $stmt = $conn->prepare("SELECT * FROM pu_users WHERE user_id = :usid");
+    $stmt->bindParam(":usid", $currentuserid);
+    if($stmt->execute()) {
+      $result = $stmt->rowCount();
+      $data = $stmt->fetch();
+      if($result > 0) {
+
+      } else {
+        header("Location: home/");
+      }
+    } else {
+      header("Location: home/");
+    }
   }
 ?>
 
 <div class="row">
   <div class="col-md-2" style="border-right: 1px solid white;">
-      <img src="<?php base() ?>img/background.gif" alt="" class="sticky-top overflow-auto rounded shadow profile-img" style="margin-bottom: 15px;">
-      <h5>Nutzername</h5>
+      <img src="<?php 
+        if($data['profileimg'] === NULL) {
+          echo base() . 'img/nopimg.png';
+        } else if(file_exists('usercontent/profileImg/' . $data['profileimg'])) {
+          echo insertBase() . 'usercontent/profileImg/' . convertChars($data['profileimg']);
+        } else {
+          echo base() . 'img/nopimg.png';
+        }
+      ?>" alt="" class="sticky-top overflow-auto rounded shadow profile-img" style="margin-bottom: 15px;">
+      <a href="" class="btn btn-outline-dark btn-block btn-mg mb-3">Folgen</a>
+      <h5><?php echo $data['displayname']; ?></h5>
+      <p class="text-muted font-italic font-weight-light"><?php echo $data['biographie']; ?></p>
   </div>
-  <div class="col-md-10">
-    <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Profil</a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Alle Rezepte</a>
-      </li>
-      <li class="nav-item" role="presentation" title="Folgen wurde deaktiviert.">
-        <a class="nav-link disabled shadow-sm bg-white rounded" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-disabled="true">Folgen</a>
-      </li>
-  </ul>
-  <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">...</div>
-      <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-    </div>
+    <div class="col-md-10">
+      <?php
+        $stmt = $conn->prepare("SELECT * FROM pu_recipes WHERE recipe_author = :userid AND recipe_status = 2");
+        $stmt->bindParam(":userid", $currentuserid);
+        if($stmt->execute()) {
+          $result = $stmt->rowCount();
+          if($result > 0) {
+            echo '<div class="row row-cols-1 row-cols-md-3">';
+            while($row = $stmt->fetch()) {
+              ?>
+              <div class="col">
+                <div class="card h-100">
+                  <img src="<?php 
+                    if($row['recipe_image'] === NULL) {
+                      echo base() . 'img/noimg.png';
+                    } else if(file_exists('usercontent/recipeImg/' . $row['recipe_image'])) {
+                      echo base() . 'usercontent/recipeImg/' . convertChars($row['recipe_image']);
+                    } else {
+                      echo base() . 'img/noimg.png';
+                    }
+                    ?>" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title"><?php
+                      $rfp = "";
+                      $rpp = "";
+                      if($row['recipe_featured'] == 1) {
+                        $rfp = '<i class="fas fa-crown" title="Featured" style="font-size: 13px; cursor: pointer;"></i> ';
+                      }
+                      if($row['recipe_pinned'] == 1) {
+                        $rpp = '<i class="fas fa-map-pin" title="Pinned" style="font-size: 13px; cursor: pointer;"></i> ';
+                      }
+                      echo $rfp . $rpp . convertChars($row['recipe_title']);
+                      ?></h5>
+                      <p class="card-text"><?=convertChars($row['recipe_description']); ?></p>
+                      <a class="btn btn-dark align-items-end" href="<?php base() ?>viewrecipe/<?php echo $row['pu_recipeid']; ?>" role="button">Anzeigen</a>
+                  </div>
+                  <div class="card-footer">
+                      <small class="text-muted">Gepostet am <?php echo date("d.m.Y", $row['recipe_posted']) . ' um ' . date("G:i", $row['recipe_posted']); ?></small>
+                  </div>
+                </div>
+              </div>
+              <?php
+            }
+          } else {
+            echo '<div class="alert alert-danger" role="alert">
+            Dieser Nutzer hat keine Rezepte öffentlich geposted!
+          </div>';
+          }
+        } 
+      ?>
+    <?php echo '</div>'; ?>
   </div>
 </div>
 

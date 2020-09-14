@@ -87,7 +87,7 @@ if(is_numeric($urldata)) {
 </div>
 
 <?php
-  if(getTeamLevel($_SESSION['pu_login'])) {
+  if(getTeamLevel($userid)) {
     ?>
     <div class="modal fade" id="recipeManager" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
