@@ -1,7 +1,6 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="index3.html" class="brand-link">
-        <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-            style="opacity: .8">
+        <a href="dashboard.php" class="brand-link">
+        <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">PommesUnity ACP</span>
         </a>
 
@@ -38,7 +37,23 @@
                     <a href="recipes.php" class="nav-link">
                     <i class="nav-icon fas fa-list"></i>
                     <p>
-                        Rezepte
+                        Aktive Rezepte
+                    </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="recipes-check.php" class="nav-link">
+                    <i class="nav-icon fas fa-clock"></i>
+                    <p>
+                        Rezepte - Überprüfung
+                    </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="recipes-banned.php" class="nav-link">
+                    <i class="nav-icon fas fa-minus-circle"></i>
+                    <p>
+                        Rezepte - Gesperrt
                     </p>
                     </a>
                 </li>

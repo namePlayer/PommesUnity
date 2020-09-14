@@ -74,7 +74,7 @@ if(isset($_SESSION['pu_login'])) {
         <div class="col-12">
         <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Liste aller Registrierten Nutzer</h3>
+              <h3 class="card-title">Liste aller Aktiven Rezepte</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
@@ -91,7 +91,7 @@ if(isset($_SESSION['pu_login'])) {
                 </thead>
                 <tbody>
                 <?php
-                    $stmt = $conn->prepare("SELECT * FROM pu_recipes");
+                    $stmt = $conn->prepare("SELECT * FROM pu_recipes WHERE recipe_status = 2 OR recipe_status = 1 ORDER BY recipe_posted DESC");
                     $stmt->execute();
                     while($row = $stmt->fetch()) {
                         echo '<tr role="row" class="odd">

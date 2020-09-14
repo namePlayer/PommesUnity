@@ -32,6 +32,7 @@
       ?>" alt="" class="sticky-top overflow-auto rounded shadow profile-img" style="margin-bottom: 15px;">
       <a href="" class="btn btn-outline-dark btn-block btn-mg mb-3">Folgen</a>
       <h5><?php echo $data['displayname']; ?></h5>
+      <small>Anzeigename: <?php echo renderDisplaynameOther($currentuserid); ?></small>
       <p class="text-muted font-italic font-weight-light"><?php echo $data['biographie']; ?></p>
   </div>
     <div class="col-md-10">
