@@ -114,7 +114,13 @@ if(isset($_SESSION['pu_login'])) {
               <div class="info-box-content">
                 <span class="info-box-text">Meldungen</span>
                 <span class="info-box-number">
-                0
+                <?php
+                    $date = strtotime('-24 hours', time());
+                    $stmt = $conn->prepare("SELECT * FROM pu_reports WHERE report_status = 1");
+                    $stmt->execute();
+                    $result = $stmt->rowCount();
+                    echo $result;
+                  ?>
                 </span>
               </div>
             </div>

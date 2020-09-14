@@ -80,6 +80,41 @@ if(isset($_SESSION['pu_login'])) {
                                     </div>';                        
                     }
                 }
+                if($action == "cla") {
+                  $stmt = $conn->prepare("UPDATE pu_reports SET report_status = 0 WHERE report_info = :ident AND report_type = 1");
+                  $stmt->bindParam(":ident", $reqid);
+                  if($stmt->execute()) {
+                      $return = '<div class="alert alert-success" role="alert">
+                                      Es wurden erfolgreich alle Meldungen geschlossen!
+                                  </div>';
+                  } else {
+                      $return = '<div class="alert alert-danger" role="alert">
+                                      Die Meldungen konnten nicht geschlossen werden!
+                                  </div>';                        
+                  }
+              }
+            }
+
+            if(isset($_POST['recipeTitle']) && isset($_POST['recipeDesc']) && isset($_POST['recipetext'])) {
+              $title = $_POST['recipeTitle'];
+              $desc = $_POST['recipeDesc'];
+              $text = $_POST['recipetext'];
+              if(!empty($title) && !empty($desc) && !empty($text)) {
+                $stmt = $conn->prepare("UPDATE pu_recipes SET recipe_title=:title, recipe_description=:descript, recipe_text=:descr WHERE pu_recipeid = :id");
+                $stmt->bindParam(":title", $title);
+                $stmt->bindParam(":descript", $desc);
+                $stmt->bindParam(":descr", $text);
+                $stmt->bindParam(":id", $reqid);
+                if($stmt->execute()) {
+                  $return = '<div class="alert alert-success" role="alert">
+                  Das Rezept wurde erfolgreich geupdated!
+              </div>';
+                } else {
+                  $return = '<div class="alert alert-danger" role="alert">
+                  Das Rezept konnte nicht geupdated werden!
+              </div>';
+                }
+              }
             }
         }
     }
@@ -103,6 +138,20 @@ if(isset($_SESSION['pu_login'])) {
   <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <script src="../js/tinymce/tinymce.min.js"></script>
+  <script>
+    tinymce.init({
+        selector:'textarea',
+        menubar: false,
+        plugins: 'lists',
+        toolbar: 'bold italic underline | styleselect | forecolor | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | undo redo',
+        setup: function (editor) {
+            editor.on('change', function () {
+                tinymce.triggerSave();
+            });
+        }
+    });
+    </script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -241,7 +290,7 @@ if(isset($_SESSION['pu_login'])) {
                         if($stmt->execute()) {
                             $result = $stmt->rowCount();
                             if($result > 0) {
-                                echo '<a href="managerecipe.php?id='.$reqid.'&act=" class="btn btn-success float-right mb-3">Alle Meldungen schließen</a>';
+                                echo '<a href="managerecipe.php?id='.$reqid.'&act=cla" class="btn btn-success float-right mb-3">Alle Meldungen schließen</a>';
                                 echo '<table class="table">
                                 <thead>
                                   <tr>
@@ -257,7 +306,7 @@ if(isset($_SESSION['pu_login'])) {
                                     ?>
                                     <tr>
                                         <th scope="row"><?= $row['report_id']; ?></th>
-                                        <td><?= renderDisplaynameOther($row['report_id']); ?></td>
+                                        <td><?= renderDisplaynameOther($row['report_by']); ?></td>
                                         <td><?= convertChars($row['report_message']); ?></td>
                                         <td><?= date('d.m.Y', $row['report_at']) . ' um ' . date('G:i', $row['report_at'])?></td>
                                         <td><a href="#">Löschen</a></td>
@@ -272,7 +321,20 @@ if(isset($_SESSION['pu_login'])) {
                     ?>
                   </div>
                   <div class="tab-pane" id="manage">
-                    
+                    <form action="" method="post">
+                      <div class="mb-3">
+                        <label for="recipeTitle" class="form-label">Rezept Titel</label>
+                        <input type="text" class="form-control" id="recipeTitle" name="recipeTitle" value="<?php echo $data['recipe_title'];?>" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="recipeDesc" class="form-label">Rezept Beschreibung</label>
+                        <input type="text" class="form-control" id="recipeDesc" name="recipeDesc" value="<?php echo $data['recipe_description'];?>" required>
+                      </div>
+                      <div class="mb-3">
+                        <textarea name="recipetext" id="" cols="30" rows="10"><?php echo $data['recipe_text'];?>"</textarea>
+                      </div>
+                      <button type="submit" class="btn btn-dark">Speichern</button>
+                    </form>
                   </div>
                 </div>
               </div>

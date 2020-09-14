@@ -11,7 +11,21 @@ if(is_numeric($urldata)) {
       header("Location: ".insertBase()."recipes/");
     } else {
       if($data['recipe_status'] == 1 || $data['recipe_status'] == 2) {
-
+        if(isset($_POST['reportReason'])) {
+          $reason = $_POST['reportReason'];
+          if(!empty($reason)) {
+            $stmt = $conn->prepare("INSERT INTO pu_reports (report_by, report_type, report_info, report_status, report_at, report_message) VALUES (:usid, 1, :req, 1, :curtime, :msg)");
+            $stmt->bindParam(":usid", $userid);
+            $stmt->bindParam(":req", $urldata);
+            $stmt->bindParam(":curtime", $currenttime);
+            $stmt->bindParam(":msg", $reason);
+            if($stmt->execute()) {
+              $return = '<div class="alert alert-success" role="alert">
+              Vielen Dank für deine Meldung, das Team wird sich in kürze darum Kümmern!
+            </div>';
+            }
+          }
+        }
       } else {
         header("Location: ".insertBase()."recipes/");
       }
@@ -20,7 +34,9 @@ if(is_numeric($urldata)) {
     header("Location: ".insertBase()."recipes/");
 }
 
-?>
+?>  
+
+<?= $return; ?>
 
 <div class="row">
     <div class="col-md-3" style="margin-bottom: 35px;">
@@ -73,8 +89,8 @@ if(is_numeric($urldata)) {
                 <input type="text" id="disabledTextInput" class="form-control" placeholder="<?= $data['pu_recipeid']; ?>" value="<?= $data['pu_recipeid']; ?>" required disabled>
             </div>
             <div class="mb-3">
-                <label for="inputPassword5" class="form-label">Grund in wenigen Worten</label>
-                <input type="password" id="inputPassword5" class="form-control" required>
+                <label for="reportReason" class="form-label">Grund in wenigen Worten</label>
+                <input type="text" id="reportReason" name="reportReason" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-dark float-right">Jetzt melden</button>
         </form>

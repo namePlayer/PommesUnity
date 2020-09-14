@@ -49,7 +49,6 @@ if(isset($_SESSION['pu_login'])) {
     <?php require_once('assets/header.php'); ?>
 
     <div class="container" style="margin-top: 25px; position: relative; ">
-    <?= $return ?>
         <noscript>
             <div class="alert alert-warning" role="alert">
             <strong>Warnung!</strong> Einige Elemente dieser Seite funktionieren nicht, da Javascript deaktiviert ist!
