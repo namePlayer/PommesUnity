@@ -3,7 +3,7 @@ session_start();
 $return = '';
 date_default_timezone_set('Europe/Berlin');
 $currenttime = time();
-# error_reporting(1);
+error_reporting(0);
 require_once('inc/routes.inc.php');
 require_once('inc/database.inc.php');
 require_once('inc/timefunct.inc.php');
