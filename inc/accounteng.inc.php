@@ -151,3 +151,17 @@ function getTeamLevel($userid) {
         }
     }
 }
+
+function getRecipeName(int $identifier) {
+    global $conn;
+    $getrecipenamestmt = $conn->prepare("SELECT recipe_title FROM pu_recipes WHERE pu_recipeid = :ident");
+    $getrecipenamestmt->bindParam(":ident", $identifier);
+    $getrecipenamestmt->execute();
+    $getrecipenameresult = $getrecipenamestmt->rowCount();
+    $getrecipenamedata = $getrecipenamestmt->fetch();
+    if($getrecipenameresult > 0) {
+        return $getrecipenamedata['recipe_title'];
+    } else {
+        return NULL;
+    }
+}

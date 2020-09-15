@@ -37,7 +37,3 @@ function base() {
 function insertBase() {
     return str_replace('index.php', '', $_SERVER['PHP_SELF']);
 }
-
-function getBaseACP() {
-    
-}

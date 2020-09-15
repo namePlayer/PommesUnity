@@ -57,6 +57,22 @@
                     </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="reports-recipe.php" class="nav-link">
+                    <i class="nav-icon fas fa-exclamation"></i>
+                    <p>
+                        Rezept-Meldungen
+                    </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reports-users.php" class="nav-link">
+                    <i class="nav-icon fas fa-exclamation"></i>
+                    <p>
+                        Konto-Meldungen
+                    </p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

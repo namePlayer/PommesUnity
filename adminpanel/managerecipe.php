@@ -331,7 +331,7 @@ if(isset($_SESSION['pu_login'])) {
                         <input type="text" class="form-control" id="recipeDesc" name="recipeDesc" value="<?php echo $data['recipe_description'];?>" required>
                       </div>
                       <div class="mb-3">
-                        <textarea name="recipetext" id="" cols="30" rows="10"><?php echo $data['recipe_text'];?>"</textarea>
+                        <textarea name="recipetext" id="" cols="30" rows="10"><?php echo $data['recipe_text'];?></textarea>
                       </div>
                       <button type="submit" class="btn btn-dark">Speichern</button>
                     </form>

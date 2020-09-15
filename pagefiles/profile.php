@@ -9,7 +9,21 @@
       $result = $stmt->rowCount();
       $data = $stmt->fetch();
       if($result > 0) {
-
+        if(isset($_POST['reportReason'])) {
+          $reason = $_POST['reportReason'];
+          if(!empty($reason)) {
+            $stmt = $conn->prepare("INSERT INTO pu_reports (report_by, report_type, report_info, report_status, report_at, report_message) VALUES (:usid, 2, :req, 1, :curtime, :msg)");
+            $stmt->bindParam(":usid", $userid);
+            $stmt->bindParam(":req", $currentuserid);
+            $stmt->bindParam(":curtime", $currenttime);
+            $stmt->bindParam(":msg", $reason);
+            if($stmt->execute()) {
+              $return = '<div class="alert alert-success" role="alert">
+              Vielen Dank für deine Meldung, das Team wird sich in kürze darum Kümmern!
+            </div>';
+            }
+          }
+        }
       } else {
         header("Location: home/");
       }
@@ -18,6 +32,8 @@
     }
   }
 ?>
+
+<?= $return; ?>
 
 <div class="row">
   <div class="col-md-2" style="border-right: 1px solid white;">
@@ -34,6 +50,8 @@
       <h5><?php echo $data['displayname']; ?></h5>
       <small>Anzeigename: <?php echo renderDisplaynameOther($currentuserid); ?></small>
       <p class="text-muted font-italic font-weight-light"><?php echo $data['biographie']; ?></p>
+      <hr>
+      <a href="#" data-toggle="modal" data-target="#reportUser"><i class="fas fa-exclamation-circle"></i> Konto Melden</a>
   </div>
     <div class="col-md-10">
       <?php
@@ -103,11 +121,11 @@
             <form action="" method="post">
                 <div class="mb-3">
                     <label for="disabledTextInput" class="form-label">Nutzer ID</label>
-                    <input type="text" id="disabledTextInput" class="form-control" placeholder="<?= $data['pu_recipeid']; ?>" value="<?= $data['pu_recipeid']; ?>" required disabled>
+                    <input type="text" id="disabledTextInput" class="form-control" placeholder="<?= $data['user_id']; ?>" value="<?= $data['user_id']; ?>" required disabled>
                 </div>
                 <div class="mb-3">
-                    <label for="inputPassword5" class="form-label">Grund in wenigen Worten</label>
-                    <input type="password" id="inputPassword5" class="form-control" required>
+                    <label for="reportReason" class="form-label">Grund in wenigen Worten</label>
+                    <input type="text" id="reportReason" name="reportReason" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-dark float-right">Jetzt melden</button>
             </form>
@@ -135,7 +153,7 @@
             <form action="" method="post">
                 <div class="mb-3">
                     <label for="disabledTextInput" class="form-label">Nutzer ID</label>
-                    <input type="text" id="disabledTextInput" class="form-control" placeholder="<?= $data['pu_recipeid']; ?>" value="<?= $data['pu_recipeid']; ?>" required disabled>
+                    <input type="text" id="disabledTextInput" class="form-control" placeholder="<?= $data['user_id']; ?>" value="<?= $data['user_id']; ?>" required disabled>
                 </div>
                 <div class="mb-3">
                     <label for="inputPassword5" class="form-label">Grund in wenigen Worten</label>

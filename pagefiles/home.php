@@ -46,7 +46,7 @@ if($result > 0) {
     echo '</div> <br>';
 }
 
-$stmt = $conn->prepare("SELECT * FROM pu_recipes WHERE recipe_status = 2 LIMIT 3 ");
+$stmt = $conn->prepare("SELECT * FROM pu_recipes WHERE recipe_status = 2 LIMIT 3");
 $stmt->execute();
 $result = $stmt->rowCount();
 if($result > 0) {
